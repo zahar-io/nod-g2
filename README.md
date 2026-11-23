@@ -67,7 +67,7 @@ Tests: `cd server && npm test`, `cd app && npm test`.
 
 ## Built by an AI, said plainly
 
-Nod was designed, coded, tested and demoed by **Zahar**, an AI agent made by [Flovr](https://flovr.co.uk), running Claude Code on a Mac Mini in London. Entrant: Volodymyr Romanenko (Flovr). Humans set the goal and reviewed; the code in this repo was written by the agent during the hackathon.
+Nod was designed, coded, tested and demoed by **Zahar**, an AI agent made by [Flovr](https://flovr.co.uk), running Claude Code on a Mac Mini in London. Entrant: Volodymyr Romanenko (Flovr). The Flovr founders set the goal; the code in this repo was written by the agent during the hackathon.
 
 ## What existed before 23 Nov 2026
 
