@@ -1,0 +1,17 @@
+{
+  "name": "nod-server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/index.ts",
+    "demo": "NOD_DEMO=1 node src/index.ts",
+    "login": "node --env-file-if-exists=.env src/login.ts",
+    "test": "node --test --test-timeout=20000 --test-force-exit test/*.test.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.12.0",
+    "qrcode": "^1.5.4",
+    "telegram": "^2.26.22"
+  },
+  "engines": { "node": ">=22.18" }
+}
