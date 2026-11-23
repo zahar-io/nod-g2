@@ -64,6 +64,18 @@ export function lines(s: string, max: number): string[] {
     .slice(0, max)
 }
 
+/** Keep the gist glanceable: no sender name, no 'yes or no' tail, at most 7 words. */
+export function shortGist(from: string, out: string): string {
+  const first = from.split(' ')[0].toLowerCase()
+  let words = out.split('\n')[0].replace(/[.?]?\s*yes or no\??$/i, '?').trim().split(/\s+/)
+  if (words[0] && words[0].toLowerCase().replace(/('s|[:,-])$/, '').replace(/[:,'-]/g, '') === first) words = words.slice(1)
+  const q = /\?$/.test(words.join(' '))
+  if (words.length > 7) words = words.slice(0, 7)
+  let g = words.join(' ').replace(/[.,;:]$/, '')
+  if (q && !g.endsWith('?')) g += '?'
+  return g.charAt(0).toUpperCase() + g.slice(1)
+}
+
 export function createAi(complete?: Complete): Ai {
   const run = complete ?? (process.env.ANTHROPIC_API_KEY ? sdkComplete() : cliComplete())
   const cache = new Map<string, Promise<string>>()
@@ -83,8 +95,8 @@ export function createAi(complete?: Complete): Ai {
     async gist(from, text) {
       if (text.length <= 48) return text
       const out = await once(`g:${from}:${text}`,
-        `In at most 7 words, say what this message needs from me (a decision, an answer or nothing). Start with the verb or the thing, not the sender's name. Keep any time, amount or name. Output only the words.\n\nFrom: ${from}\nMessage:\n${text}`)
-      return out.split('\n')[0]
+        `In at most 6 words, say what this message needs from me. Start with the verb or the thing. Never include the sender's name, and don't add 'yes or no'. Keep any time, amount or name. Output only the words.\n\nFrom: ${from}\nMessage:\n${text}`)
+      return shortGist(from, out)
     },
     async drafts(chatTitle, history) {
       const out = await once(`d:${chatTitle}:${fmt(history)}`,

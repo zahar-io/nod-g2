@@ -5,6 +5,8 @@ import {
   CreateStartUpPageContainer,
   ListContainerProperty,
   ListItemContainerProperty,
+  MenuContainerProperty,
+  MenuItemProperty,
   OsEventTypeList,
   RebuildPageContainer,
   TextContainerProperty,
@@ -44,7 +46,11 @@ async function show(next: Screen) {
         }),
       ]
     : undefined
-  const page = { containerTotalNum: listObject ? 2 : 1, textObject, listObject }
+  // Home also gets two actions in the glasses' own menu (tap, then hold).
+  const menuObject = next.name === 'home'
+    ? new MenuContainerProperty({ menuItems: [new MenuItemProperty({ itemName: 'Refresh', itemID: 1 }), new MenuItemProperty({ itemName: 'Channel digest', itemID: 2 })] })
+    : undefined
+  const page = { containerTotalNum: listObject ? 2 : 1, textObject, listObject, menuObject }
   if (!started) {
     started = true
     await bridge.createStartUpPageContainer(new CreateStartUpPageContainer(page))
@@ -186,6 +192,12 @@ async function select(i: number) {
 }
 
 bridge.onEvenHubEvent(event => {
+  const menu = event.menuItemClickEvent?.itemID
+  if (menu && screen.name === 'home' && !busy) {
+    busy = true
+    void select(view(screen).list!.indexOf(menu === 1 ? REFRESH : DIGEST)).finally(() => (busy = false))
+    return
+  }
   if (event.audioEvent?.audioPcm && rec) rec.chunks.push(event.audioEvent.audioPcm)
   const t = typeOf(event.listEvent) ?? typeOf(event.textEvent) ?? typeOf(event.sysEvent)
   if (t === null) return

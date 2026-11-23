@@ -97,3 +97,13 @@ test('helpers', async () => {
   assert.equal(wav.length, 54)
   assert.equal(new TextDecoder().decode(wav.slice(0, 4)), 'RIFF')
 })
+
+test('gist strips the sender name and yes-or-no tails', async () => {
+  const { createAi } = await import('../src/ai.ts')
+  const ai = createAi(async () => 'Sam: start standup without him? Yes or no?')
+  assert.equal(await ai.gist('Sam Smith', 'x'.repeat(60)), 'Start standup without him?')
+  const { shortGist } = await import('../src/ai.ts')
+  assert.equal(shortGist('Sam', "Sam's train is delayed 15 min, start standup without him?"), 'Train is delayed 15 min, start standup?')
+  const ai2 = createAi(async () => '1. Yes\n2. No\n3. Later')
+  assert.deepEqual(await ai2.drafts('Anna', []), ['Yes', 'No', 'Later'])
+})
