@@ -1,5 +1,6 @@
 // One-time Telegram login by QR code: no phone number or SMS typed here.
 // Open Telegram on your phone > Settings > Devices > Link Desktop Device, and scan.
+// Or `npm run login -- +441234567890` to log in with the code Telegram sends to your app.
 // Saves the session to server/.session (mode 600). Never commit it.
 import { writeFile } from 'node:fs/promises'
 import { createInterface } from 'node:readline/promises'
@@ -18,7 +19,16 @@ const client = new TelegramClient(new StringSession(''), apiId, apiHash, { conne
 await client.connect()
 const rl = createInterface({ input: process.stdin, output: process.stdout })
 
-await client.signInUserWithQrCode({ apiId, apiHash }, {
+const phone = process.argv[2] // `npm run login -- +44...` = code login; no argument = QR login
+if (phone) {
+  await client.start({
+    phoneNumber: phone,
+    forceSMS: process.env.TG_FORCE_SMS === '1', // when no other device is logged in to read the code
+    phoneCode: async () => rl.question('Login code from Telegram: '),
+    password: async hint => rl.question(`Two-step verification password${hint ? ` (hint: ${hint})` : ''}: `),
+    onError: err => console.error(err.message),
+  })
+} else await client.signInUserWithQrCode({ apiId, apiHash }, {
   qrCode: async code => {
     const url = `tg://login?token=${code.token.toString('base64url')}`
     console.log(await QRCode.toString(url, { type: 'terminal', small: true }))
