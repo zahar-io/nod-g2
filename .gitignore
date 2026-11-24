@@ -4,3 +4,4 @@ dist/
 .env
 .session
 login-qr.png
+login-zahar.sh

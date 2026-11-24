@@ -5,6 +5,8 @@
 import { writeFile } from 'node:fs/promises'
 import { createInterface } from 'node:readline/promises'
 import QRCode from 'qrcode'
+import { createConnection } from 'node:net'
+import { homedir } from 'node:os'
 import { TelegramClient } from 'telegram'
 import { StringSession } from 'telegram/sessions/index.js'
 
@@ -19,7 +21,20 @@ const client = new TelegramClient(new StringSession(''), apiId, apiHash, { conne
 await client.connect()
 const rl = createInterface({ input: process.stdin, output: process.stdout })
 
-const phone = process.argv[2] // `npm run login -- +44...` = code login; no argument = QR login
+// `--via-caller`: hand the QR token to an already-logged-in session of the same account over a local socket
+// (Zahar's caller), which approves it in its own process. No code to read, no second client on its key.
+const viaCaller = process.argv.includes('--via-caller')
+function acceptViaCaller(token: string): Promise<{ ok: boolean; error?: string; session?: string }> {
+  return new Promise((resolve, reject) => {
+    const sock = createConnection(`${homedir()}/.zahar/caller.sock`)
+    let buf = ''
+    sock.on('data', d => (buf += d))
+    sock.on('end', () => resolve(JSON.parse(buf || '{"ok":false,"error":"no answer"}')))
+    sock.on('error', reject)
+    sock.write(JSON.stringify({ op: 'accept_login_token', token, task: 'T1602' }) + '\n')
+  })
+}
+const phone = process.argv.slice(2).find(a => a.startsWith('+')) // `npm run login -- +44...` = code login; no argument = QR login
 if (phone) {
   await client.start({
     phoneNumber: phone,
@@ -30,12 +45,20 @@ if (phone) {
   })
 } else await client.signInUserWithQrCode({ apiId, apiHash }, {
   qrCode: async code => {
+    if (viaCaller) {
+      const r = await acceptViaCaller(code.token.toString('base64url'))
+      console.log(r.ok ? `Approved by the caller session (${r.session}).` : `Caller refused: ${r.error}`)
+      return
+    }
     const url = `tg://login?token=${code.token.toString('base64url')}`
     console.log(await QRCode.toString(url, { type: 'terminal', small: true }))
     await QRCode.toFile('login-qr.png', url)
     console.log('Scan in Telegram: Settings > Devices > Link Desktop Device (also saved as login-qr.png). Refreshes every 30 s.')
   },
-  password: async hint => rl.question(`Two-step verification password${hint ? ` (hint: ${hint})` : ''}: `),
+  password: async hint => {
+    if (!process.stdin.isTTY) throw new Error('TWO_STEP_PASSWORD_NEEDED: a person must run this in a terminal and type the password')
+    return rl.question(`Two-step verification password${hint ? ` (hint: ${hint})` : ''}: `)
+  },
   onError: async err => {
     console.error(err.message)
     return true
