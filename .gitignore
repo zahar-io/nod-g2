@@ -5,3 +5,4 @@ dist/
 .session
 login-qr.png
 login-zahar.sh
+server/run-live.sh

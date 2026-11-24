@@ -53,7 +53,7 @@ export function fit(s: string, bytes = 60): string {
 const firstName = (s: string) => s.replace(/\(.*?\)/g, '').trim().split(/\s+/)[0] || s
 
 export function homeRow(it: FeedItem): string {
-  if (it.kind === 'approval') return fit(`! ${firstName(it.title)}: ${it.gist}`)
+  if (it.kind === 'approval') return fit(`! ${it.title.length <= 14 ? it.title : firstName(it.title)}: ${it.gist}`)
   const n = it.unread > 1 ? ` (${it.unread})` : ''
   return fit(`${firstName(it.title)}${n}: ${it.gist}`)
 }

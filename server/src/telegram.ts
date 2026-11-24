@@ -75,14 +75,17 @@ export async function createTelegramProvider(cfg: TelegramConfig): Promise<Provi
             if (!buttons.length) continue
             const sender = await m.getSender().catch(() => undefined)
             approvals.push({
-              key: `a:${id}:${m.id}`, kind: 'approval', chatId: id, chatTitle: d.title ?? nameOf(ent),
+              // Label an approval by the bot that asks, not the group it was asked in.
+              key: `a:${id}:${m.id}`, kind: 'approval', chatId: id, chatTitle: nameOf(sender) || d.title || 'Bot',
               msgId: m.id, from: nameOf(sender) || d.title || 'Bot', text: m.message ?? '', date: m.date,
               unread: d.unreadCount, buttons,
             })
           }
         }
         if (want && !ent?.bot && d.unreadCount > 0 && d.message && !d.message.out) {
-          const sender = await d.message.getSender().catch(() => undefined)
+          const sender: any = await d.message.getSender().catch(() => undefined)
+          // A bot's last word is an approval (above), not a conversation waiting on me.
+          if (sender?.bot || inlineButtons(d.message).length) continue
           chats.push({
             key: `c:${id}`, kind: 'chat', chatId: id, chatTitle: d.title ?? nameOf(ent), msgId: d.message.id,
             from: nameOf(sender), text: d.message.message ?? '', date: d.message.date, unread: d.unreadCount,
