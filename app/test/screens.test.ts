@@ -16,7 +16,7 @@ test('list rows fit the 63-byte firmware cap, multibyte included', () => {
 test('home: approvals marked, counts in header, digest and refresh last', () => {
   const v = view({ name: 'home', items: [a, c] })
   assert.equal(v.text, 'NOD  1 to approve · 1 to answer')
-  assert.deepEqual(v.list, ['! Ops: Renew seat, £12/month', 'Anna (2): Move call to 3pm?', DIGEST, 'Refresh'])
+  assert.deepEqual(v.list, ['! Ops agent: Renew seat, £12/month', 'Anna (2): Move call to 3pm?', DIGEST, 'Refresh'])
   assert.equal(homeRow(c), 'Anna (2): Move call to 3pm?')
 })
 
