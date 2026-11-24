@@ -64,8 +64,10 @@ export async function createTelegramProvider(cfg: TelegramConfig): Promise<Provi
         const id = d.id!.toString()
         const ent: any = d.entity
         const want = picked.size ? isPicked(picked, d) : d.isUser && !ent?.bot && !muted(d)
-        // Approvals: recent bot messages with callback buttons, in bot chats or picked chats.
-        if ((ent?.bot || want || d.isGroup) && d.message && d.message.date > dayAgo) {
+        // Approvals: recent bot messages with callback buttons. With picked chats, ONLY those chats are read
+        // (privacy: nothing else ever reaches the glasses); otherwise bot DMs and groups with unread messages.
+        const scan = picked.size ? want : ent?.bot || d.isGroup
+        if (scan && d.message && d.message.date > dayAgo) {
           const recent = d.unreadCount > 0 || want ? await client.getMessages(ent, { limit: 8 }) : []
           for (const m of recent) {
             if (m.date < dayAgo || pressed.has(`${id}:${m.id}`)) continue
