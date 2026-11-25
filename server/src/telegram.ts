@@ -107,7 +107,7 @@ export async function createTelegramProvider(cfg: TelegramConfig): Promise<Provi
       return out
     },
     async send(chatId, text, replyTo) {
-      await client.sendMessage(entity(chatId), { message: text, replyTo })
+      await client.sendMessage(entity(chatId), { message: text, replyTo, silent: process.env.NOD_SILENT === "1" })
     },
     async press(chatId, msgId, data) {
       const ans: any = await client.invoke(
