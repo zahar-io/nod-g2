@@ -45,7 +45,7 @@ cd app && npm install && npm run build
 cd ../server && npm install && npm run demo
 
 # 2b. Or on your own Telegram: get an api_id/api_hash at my.telegram.org, put them in server/.env
-#     (TG_API_ID=..., TG_API_HASH=..., optional NOD_CHATS=@anna,@sam  NOD_CHANNELS=@somechannel  NOD_TOKEN=<pairing code>)
+#     (TG_API_ID=..., TG_API_HASH=..., optional NOD_CHATS=@anna,@sam  NOD_CHANNELS=@somechannel  NOD_TOKEN=<pairing code>  NOD_SILENT=1 for sends without a notification)
 npm run login     # scan the QR in Telegram > Settings > Devices > Link Desktop Device
 npm start         # http://localhost:8787
 
