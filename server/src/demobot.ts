@@ -3,7 +3,8 @@
 //   node src/demobot.ts post   -> post the staged requests, then keep answering presses
 //   node src/demobot.ts        -> just answer presses
 const TOKEN = process.env.NOD_DEMO_BOT_TOKEN
-const CHAT = process.env.NOD_DEMO_CHAT || '-5359871175'
+const CHAT = process.env.NOD_DEMO_CHAT ?? ''
+if (!CHAT) throw new Error('Set NOD_DEMO_CHAT to the demo group id')
 if (!TOKEN) throw new Error('NOD_DEMO_BOT_TOKEN not set')
 const api = async (method: string, body: object = {}) => {
   const r = await fetch(`https://api.telegram.org/bot${TOKEN}/${method}`, {

@@ -164,7 +164,8 @@ async function select(i: number) {
       await show({ name: 'toast', text: `${b.label}...` })
       try {
         const r = await api.press(s.item, b)
-        return toast(`${b.label}: done`.slice(0, 40) + (r.answer && r.answer !== 'Done' ? `\n      ${r.answer}` : ''), () => home())
+        const extra = r.answer && r.answer !== 'Done' && r.answer !== `${b.label}: done` ? `\n      Bot: ${r.answer}` : ''
+        return toast(`${b.label}: pressed in Telegram`.slice(0, 40) + extra, () => home())
       } catch {
         return toast('Button failed, try again', () => home())
       }
