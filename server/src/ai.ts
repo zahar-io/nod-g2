@@ -113,8 +113,8 @@ export function createAi(complete?: Complete): Ai {
       if (!posts.length) return []
       const body = posts.map(p => `[${p.channel}] ${p.text}`).join('\n')
       const out = await once(`x:${body}`,
-        `Digest these channel posts into at most 5 lines, most important first. Each line: "Channel: what happened" in under 70 characters.\n\n${body}`)
-      return lines(out, 5)
+        `Digest these channel posts into at most 4 lines, most important first. Each line: "Channel: what happened" in under 55 characters.\n\n${body}`)
+      return lines(out, 4).map(l => (l.length > 58 ? l.slice(0, 57).trimEnd() + '…' : l))
     },
   }
 }
