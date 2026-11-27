@@ -5,6 +5,10 @@ Your bots and AI agents ask you things all day on Telegram: approve this spend, 
 Built for **Heads Up: Even Realities Hackathon** (DoraHacks, 23-29 Nov 2026).
 Tracks: **01 Messaging & News** (Telegram) and **04 AI Assistants & Work** (Claude). Also entering **Best Telegram integration**.
 
+## Demo video
+
+[docs/nod-demo.mp4](docs/nod-demo.mp4) (1:35, Even Hub simulator). Approvals and replies run on a real Telegram account in our own "Nod demo" group. The channel digest scene uses the built-in demo account. The voice reply is a recorded clip fed through the G2 mic path, because the build machine has no microphone.
+
 ## What it does on the glasses
 
 | Screen | You see | You do |
